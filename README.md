@@ -21,61 +21,64 @@ Or clone the repo:
 
 Usage
 -----
-.. code-block:: python
-    from peanutdb import PeanutDB
+```python
 
-    db = PeanutDB("path/to/db.json")
-    # or db = PeanutDB() for in-memory
+from peanutdb import PeanutDB
 
-    db.create_table(
-        table_name="Users",
-        schema={
-            "username": {"type": "text", "unique": True, "notnull": True},
-            "name": {"type": "text", "unique": False, "notnull": True}
-        }
-    )
-    # "__ID" field is automatically added to schema as primary key
-    # like so, "__ID": {"type": "text", "unique": True, "notnull": True}
-    # Data Types: "text", "number", "boolean", "list", "dict", "any"
+db = PeanutDB("path/to/db.json")
+# or db = PeanutDB() for in-memory
 
-    db.insert(
-        table_name="Users",
-        fields={
-            "username": "john",
-            "name": "John Doe"
-        }
-    )
-    # "__ID" field is automatically inserted as primary key using `uuid.uuid4()`
+db.create_table(
+    table_name="Users",
+    schema={
+        "username": {"type": "text", "unique": True, "notnull": True},
+        "name": {"type": "text", "unique": False, "notnull": True}
+    }
+)
+# "__ID" field is automatically added to schema as primary key
+# like so, "__ID": {"type": "text", "unique": True, "notnull": True}
+# Data Types: "text", "number", "boolean", "list", "dict", "any"
 
-    result = db.select(
-        table_name="Users",
-        where={
-            "username": "john"
-        }
-    )
-    print(result)
-    # db.select(table_name="Users") to get all items from a table.
+db.insert(
+    table_name="Users",
+    fields={
+        "username": "john",
+        "name": "John Doe"
+    }
+)
+# "__ID" field is automatically inserted as primary key using `uuid.uuid4()`
 
-    db.update(
-        table_name="Users",
-        fields={
-            "name": "Johnathon Doe"
-        },
-        where={
-            "username": "john"
-        }
-    )
+result = db.select(
+    table_name="Users",
+    where={
+        "username": "john"
+    }
+)
+print(result)
+# db.select(table_name="Users") to get all items from a table.
 
-    db.delete(
-        table_name="Users",
-        where={
-            "username": "john"
-        }
-    )
+db.update(
+    table_name="Users",
+    fields={
+        "name": "Johnathon Doe"
+    },
+    where={
+        "username": "john"
+    }
+)
 
-    db.delete_table(
-        table_name="Users"
-    )
+db.delete(
+    table_name="Users",
+    where={
+        "username": "john"
+    }
+)
+
+db.delete_table(
+    table_name="Users"
+)
+
+```
 
 Meta
 ----
