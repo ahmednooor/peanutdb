@@ -1,4 +1,4 @@
-# Dev/Deployment
+# Dev
 sphinx
 sphinx_rtd_theme
 nose
