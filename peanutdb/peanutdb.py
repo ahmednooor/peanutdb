@@ -72,51 +72,19 @@ class PeanutDB:
                     value is None):
                 type_checked = True
             else:
-                # raise TypeError(
-                #     "Type of {}={} not matched with schema of '{}' table.\n{}: {}"
-                #     .format(
-                #         field_name,
-                #         value,
-                #         table_name,
-                #         field_name,
-                #         self._db["__schemas__"][table_name][field_name]
-                #     )
-                # )
-                return False
+                return None
             # ---
             if self._db["__schemas__"][table_name][field_name]["unique"] is True:
                 for data_item in self._db[table_name]:
                     if field_name in data_item and data_item[field_name] == value:
-                        # raise ValueError(
-                        #     "Value of {}={} already exists in '{}' table \
-                        #      and does not satisfy the schema.\n{}: {}"
-                        #     .format(
-                        #         field_name,
-                        #         value,
-                        #         table_name,
-                        #         field_name,
-                        #         self._db["__schemas__"][table_name][field_name]
-                        #     )
-                        # )
-                        return False
+                        return None
                 unique_checked = True
             else:
                 unique_checked = True
             # ---
             if (self._db["__schemas__"][table_name][field_name]["notnull"] is True and
                     value is None):
-                # raise ValueError(
-                #     "Value of {}={} can not be empty or None in '{}' table \
-                #      and does not satisfy the schema.\n{}: {}"
-                #     .format(
-                #         field_name,
-                #         value,
-                #         table_name,
-                #         field_name,
-                #         self._db["__schemas__"][table_name][field_name]
-                #     )
-                # )
-                return False
+                return None
             else:
                 notnull_checked = True
             # ---
@@ -126,7 +94,7 @@ class PeanutDB:
                 notnull_checked is True
             )
         except KeyError:
-            return False
+            return None
 
     def create_table(self, table_name, schema=None):
         """
@@ -144,17 +112,11 @@ class PeanutDB:
         """
         if (table_name in self._db["__schemas__"] or
                 table_name in self._db):
-            return False
+            return None
         # ---
         if (table_name == "" or
                 not isinstance(table_name, str)):
-            # raise TypeError(
-            #     "Invalid table name: {}\nTable name should consist of non-empty string."
-            #     .format(
-            #         table_name
-            #     )
-            # )
-            return False
+            return None
         # ---
         if schema is None:
             self._db["__schemas__"][table_name] = None
@@ -165,7 +127,7 @@ class PeanutDB:
                                                            "list", "dict", "any"] or
                         schema[field_name]["unique"] not in [True, False] or
                         schema[field_name]["notnull"] not in [True, False]):
-                    return False
+                    return None
             # ---
             schema["__ID"] = {
                 "type": "text",
@@ -187,11 +149,13 @@ class PeanutDB:
         if table_name in self._db["__schemas__"]:
             del self._db["__schemas__"][table_name]
         # ---
+        deleted_table = None
         if table_name in self._db:
+            deleted_table = self._db[table_name]
             del self._db[table_name]
         # ---
         self._write_db()
-        return True
+        return deleted_table
 
     def insert(self, table_name, fields):
         """
@@ -205,8 +169,7 @@ class PeanutDB:
         """
         data = fields
         if table_name not in self._db["__schemas__"] or table_name not in self._db:
-            # Raise Exception Here
-            return False
+            return None
         # ---
         if (
                 table_name in self._db["__schemas__"] and
@@ -223,20 +186,10 @@ class PeanutDB:
             # ---
             for field in new_data:
                 if field not in self._db["__schemas__"][table_name]:
-                    # raise KeyError(
-                    #     "'{}' is not defined in schema of '{}' table.\n'{}': {}"
-                    #     .format(
-                    #         field,
-                    #         table_name,
-                    #         table_name,
-                    #         self._db["__schemas__"][table_name]
-                    #     )
-                    # )
-                    return False
+                    return None
                 schema_checked = self._schema_check(table_name, field, new_data[field])
                 if not schema_checked:
-                    # Raise Exception Here
-                    return False
+                    return None
         else:
             new_data = data
             new_data["__ID"] = str(uuid.uuid4())
@@ -258,13 +211,7 @@ class PeanutDB:
         """
         params = where
         if table_name not in self._db["__schemas__"] or table_name not in self._db:
-            # raise KeyError(
-            #     "Table: '{}' is not defined."
-            #     .format(
-            #         table_name
-            #     )
-            # )
-            return False
+            return None
         if where is None:
             return self._db[table_name]
         # ---
@@ -286,7 +233,7 @@ class PeanutDB:
         if searched_items_length > 0:
             return searched_items
         # ---
-        return False
+        return None
 
     def update(self, table_name, fields, where):
         """
@@ -305,13 +252,7 @@ class PeanutDB:
         params = where
         data = fields
         if table_name not in self._db["__schemas__"] or table_name not in self._db:
-            # raise KeyError(
-            #     "Table: '{}' is not defined."
-            #     .format(
-            #         table_name
-            #     )
-            # )
-            return False
+            return None
         # ---
         if (
                 table_name in self._db["__schemas__"] and
@@ -320,20 +261,10 @@ class PeanutDB:
             # ---
             for field in new_data:
                 if field not in self._db["__schemas__"][table_name]:
-                    # raise KeyError(
-                    #     "'{}' is not defined in schema of '{}' table.\n'{}': {}"
-                    #     .format(
-                    #         field,
-                    #         table_name,
-                    #         table_name,
-                    #         self._db["__schemas__"][table_name]
-                    #     )
-                    # )
-                    return False
+                    return None
                 schema_checked = self._schema_check(table_name, field, new_data[field])
                 if not schema_checked:
-                    # Raise Exception Here
-                    return False
+                    return None
         else:
             new_data = data
         # ---
@@ -369,13 +300,7 @@ class PeanutDB:
         """
         params = where
         if table_name not in self._db["__schemas__"] or table_name not in self._db:
-            # raise KeyError(
-            #     "Table: '{}' is not defined."
-            #     .format(
-            #         table_name
-            #     )
-            # )
-            return False
+            return None
         # ---
         removed_items = []
         saved_items = []
@@ -400,4 +325,4 @@ class PeanutDB:
             self._write_db()
             return removed_items
         # ---
-        return False
+        return None
